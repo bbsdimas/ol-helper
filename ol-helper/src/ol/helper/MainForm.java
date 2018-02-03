@@ -23,7 +23,7 @@ public class MainForm extends javax.swing.JFrame  {
      */
     
     
-    String checkhost = "8.8.8.8";
+    String checkhost = "10.0.0.8";
     String linkstatustring = "НЕ ОПРДЕЛЕНО";
     private final static int SMTP_PORT = 25;
     private final static String MAIL_SERVER = "192.168.0.1";
@@ -132,6 +132,8 @@ public class MainForm extends javax.swing.JFrame  {
             } else {
                 LinkStatusPanel.setBackground(Color.red);
                 linkstatustring = "OFFLINE";
+                sendemail.setVisible(false);
+                
             }
         } catch (UnknownHostException ex) {
             Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
