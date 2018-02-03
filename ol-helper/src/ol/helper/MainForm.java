@@ -6,7 +6,7 @@
 package ol.helper;
 
 import java.awt.Color;
-import java.io.IOException;
+import java.io.*;
 import java.net.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,6 +24,14 @@ public class MainForm extends javax.swing.JFrame  {
     
     
     String checkhost = "8.8.8.8";
+    String linkstatustring = "НЕ ОПРДЕЛЕНО";
+    private final static int SMTP_PORT = 25;
+    private final static String MAIL_SERVER = "192.168.0.1";
+    private final static String SENDER_EMAIL = "it@pressa66.ru";
+    private final static String RECEIVER_EMAIL = "ilyin@pressa66.ru";
+    private final static String EMAIL_MESSAGE = "Hi! This is a test email agent!";
+
+
 
     public MainForm()throws UnknownHostException, IOException {
         initComponents();
@@ -40,6 +48,7 @@ public class MainForm extends javax.swing.JFrame  {
 
         LinkStatusPanel = new javax.swing.JPanel();
         LinkStatus = new javax.swing.JLabel();
+        sendemail = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("OL-HELPER");
@@ -50,7 +59,7 @@ public class MainForm extends javax.swing.JFrame  {
         });
 
         LinkStatus.setFont(new java.awt.Font("Courier New", 1, 14)); // NOI18N
-        LinkStatus.setText("jLabel1");
+        LinkStatus.setText("UNKNOWN");
 
         javax.swing.GroupLayout LinkStatusPanelLayout = new javax.swing.GroupLayout(LinkStatusPanel);
         LinkStatusPanel.setLayout(LinkStatusPanelLayout);
@@ -69,6 +78,20 @@ public class MainForm extends javax.swing.JFrame  {
                 .addContainerGap())
         );
 
+        sendemail.setBackground(new java.awt.Color(255, 153, 0));
+        sendemail.setFont(new java.awt.Font("Courier New", 1, 14)); // NOI18N
+        sendemail.setText("Перезвоните мне!");
+        sendemail.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sendemailActionPerformed(evt);
+            }
+        });
+        sendemail.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                sendemailKeyPressed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -77,20 +100,26 @@ public class MainForm extends javax.swing.JFrame  {
                 .addContainerGap()
                 .addComponent(LinkStatusPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addGap(62, 62, 62)
+                .addComponent(sendemail, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(LinkStatusPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(243, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 191, Short.MAX_VALUE)
+                .addComponent(sendemail)
+                .addGap(27, 27, 27))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
-        String linkstatustring = "НЕ ОПРДЕЛЕНО";
+      //  String linkstatustring = "НЕ ОПРДЕЛЕНО";
         LinkStatusPanel.setBackground(Color.yellow);
         LinkStatus.setText(linkstatustring);
         
@@ -115,6 +144,86 @@ public class MainForm extends javax.swing.JFrame  {
         
 // TODO add your handling code here:
     }//GEN-LAST:event_formWindowActivated
+
+    private void sendemailKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_sendemailKeyPressed
+    
+    }//GEN-LAST:event_sendemailKeyPressed
+
+    private void sendemailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendemailActionPerformed
+        // TODO add your handling code here:
+            linkstatustring = "SEND EMAIL";
+            LinkStatus.setText(linkstatustring); 
+     
+  //           hoststatus = "do cmd";
+    //    jLabel1.setText(hoststatus);
+     //       try {
+     //           Runtime rt = Runtime.getRuntime();
+      //          Process pr = rt.exec("c:/java/test.cmd");
+     //       } catch(Exception e) {
+              // System.out.println(e.toString());
+              //e.printStackTrace();
+       //     }; 
+            Socket socket = null;
+
+         try
+    {
+        socket = new Socket(MAIL_SERVER, SMTP_PORT);
+        InputStream is = socket.getInputStream();
+        InputStreamReader isr = new InputStreamReader(is);
+        BufferedReader br = new BufferedReader(isr);
+
+        String response = br.readLine();
+        if (!response.startsWith("220")) {
+    //        throw new Exception("220 reply not received from server.");
+        }
+
+        OutputStream os = socket.getOutputStream();
+
+        String command = "HELO\r\n";
+        os.write(command.getBytes("US-ASCII"));
+        response = br.readLine();
+        if (!response.startsWith("250")) {
+      //      throw new Exception("250 reply not received from server.");
+        }
+        command = "MAIL FROM: "+SENDER_EMAIL+"\r\n";
+        os.write(command.getBytes("US-ASCII"));
+        response = br.readLine();
+        command = "RCPT TO: "+RECEIVER_EMAIL+"\r\n";
+        os.write(command.getBytes("US-ASCII"));
+        response = br.readLine();
+        command = "DATA"+"\r\n";
+        os.write(command.getBytes("US-ASCII"));
+        response = br.readLine();
+        command = EMAIL_MESSAGE+"\r\n";
+        os.write(command.getBytes("US-ASCII"));
+        command = "\r\n."+"\r\n";
+        os.write(command.getBytes("US-ASCII"));
+        response = br.readLine();
+        command = "QUIT"+"\r\n";
+        os.write(command.getBytes("US-ASCII"));
+        response = br.readLine();
+    }
+        catch (IOException ex) {
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+        }    finally
+    {
+        if( socket != null )
+        try {
+            socket.close();
+        } catch (IOException ex) {
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }       
+         
+            linkstatustring = "SENDED EMAIL";
+            LinkStatus.setText(linkstatustring); 
+            
+            
+            
+
+        
+        
+    }//GEN-LAST:event_sendemailActionPerformed
 
     /**
      * @param args the command line arguments
@@ -158,5 +267,6 @@ public class MainForm extends javax.swing.JFrame  {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel LinkStatus;
     private javax.swing.JPanel LinkStatusPanel;
+    private javax.swing.JButton sendemail;
     // End of variables declaration//GEN-END:variables
 }
