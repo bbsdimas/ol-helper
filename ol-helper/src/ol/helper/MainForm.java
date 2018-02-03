@@ -6,17 +6,26 @@
 package ol.helper;
 
 import java.awt.Color;
+import java.io.IOException;
+import java.net.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 /**
  *
  * @author ilyin
  */
-public class MainForm extends javax.swing.JFrame {
+public class MainForm extends javax.swing.JFrame  {
 
     /**
      * Creates new form MainForm
      */
-    public MainForm() {
+    
+    
+    String checkhost = "8.8.8.8";
+
+    public MainForm()throws UnknownHostException, IOException {
         initComponents();
     }
 
@@ -30,6 +39,7 @@ public class MainForm extends javax.swing.JFrame {
     private void initComponents() {
 
         LinkStatusPanel = new javax.swing.JPanel();
+        LinkStatus = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("OL-HELPER");
@@ -39,15 +49,24 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
 
+        LinkStatus.setFont(new java.awt.Font("Courier New", 1, 14)); // NOI18N
+        LinkStatus.setText("jLabel1");
+
         javax.swing.GroupLayout LinkStatusPanelLayout = new javax.swing.GroupLayout(LinkStatusPanel);
         LinkStatusPanel.setLayout(LinkStatusPanelLayout);
         LinkStatusPanelLayout.setHorizontalGroup(
             LinkStatusPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 380, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, LinkStatusPanelLayout.createSequentialGroup()
+                .addGap(153, 153, 153)
+                .addComponent(LinkStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(155, 155, 155))
         );
         LinkStatusPanelLayout.setVerticalGroup(
             LinkStatusPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 43, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, LinkStatusPanelLayout.createSequentialGroup()
+                .addContainerGap(18, Short.MAX_VALUE)
+                .addComponent(LinkStatus)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -64,14 +83,34 @@ public class MainForm extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(LinkStatusPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(246, Short.MAX_VALUE))
+                .addContainerGap(243, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
+        String linkstatustring = "НЕ ОПРДЕЛЕНО";
         LinkStatusPanel.setBackground(Color.yellow);
+        LinkStatus.setText(linkstatustring);
+        
+        //InetAddress inet;
+        try {
+            InetAddress inet = InetAddress.getByName(checkhost);
+            if (inet.isReachable(5000)){
+                LinkStatusPanel.setBackground(Color.green);
+                linkstatustring = "ONLINE";
+            } else {
+                LinkStatusPanel.setBackground(Color.red);
+                linkstatustring = "OFFLINE";
+            }
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        LinkStatus.setText(linkstatustring);
+    //  
    
         
 // TODO add your handling code here:
@@ -107,12 +146,17 @@ public class MainForm extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new MainForm().setVisible(true);
+                try {
+                    new MainForm().setVisible(true);
+                } catch (IOException ex) {
+                    Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel LinkStatus;
     private javax.swing.JPanel LinkStatusPanel;
     // End of variables declaration//GEN-END:variables
 }
